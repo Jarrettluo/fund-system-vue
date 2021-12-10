@@ -9,23 +9,28 @@
     <div class="fund-container">
       <div class="fund-detail">
         <div class="fund-detail-name">
-          大成中证红利指数A
+          {{fundDetail.finfoFullname}}
         </div>
         <div class="fund-detail-id">
-          090010
+          {{ fundDetail.finfoWindCode }}
           <span><van-tag plain type="primary">高风险</van-tag></span>
         </div>
         <div class="fund-detail-group">
           <div class="fund-detail-group-item">
-            <div class="title person">夏高</div>
+            <div class="title person">
+              {{ fundDetail.manager }}
+            </div>
             <span>基金经理</span>
           </div>
           <div class="fund-detail-group-item">
-            <div class="title red">0.72%</div>
+            <div class="title" :class="[fundDetail.newPercent > 0 ? 'red':'']">
+              {{ fundDetail.newPercent | numFilter }}%</div>
             <span>日涨跌幅</span>
           </div>
           <div class="fund-detail-group-item">
-            <div class="title">1.9480</div>
+            <div class="title">
+              {{fundDetail.newNavUnit }}
+            </div>
             <span>最新净值</span>
           </div>
         </div>
@@ -62,17 +67,53 @@
 </template>
 
 <script>
+import requestPage from '../request/requests'
 export default {
   name: "FundDetail",
   data() {
     return {
-
+      fundDetail: {}
     }
+  },
+  filters: {
+    numFilter(value) {
+      // 截取当前数据到小数点后两位
+      let realVal = parseFloat(value*100).toFixed(2);
+      return realVal;
+    }
+  },
+  mounted() {
+    this.getFundDetailRequest();
   },
   methods: {
     backTo() {
       console.log("====")
       this.$router.push("/mySelected")
+    },
+    async getFundDetailRequest(){
+      let param = {
+        windCode: this.$route.query.windCode
+      }
+      if(!param.windCode) return
+      await requestPage.detailRequest(param)
+          .then(res => {
+            console.log(res)
+            this.updateFundDetail(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    },
+    updateFundDetail(res) {
+      if(res.code == 200 ) {
+        this.fundDetail = res.data;
+        if(this.fundDetail.chinamutualfundmanagers.length > 1) {
+          this.fundDetail.manager = this.fundDetail.chinamutualfundmanagers[0].finfoFundmanager + "等"
+        } else {
+          this.fundDetail.manager = this.fundDetail.chinamutualfundmanagers[0].finfoFundmanager
+        }
+
+      }
     }
   }
 }
