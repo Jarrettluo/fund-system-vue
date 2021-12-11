@@ -22,11 +22,11 @@
           <div class="fund-title-code">
             {{ searchedFund.finfoWindCode }}
           </div>
-          <div v-if="!searchedFund.selected" class="fund-button" @click="addSelected(searchedFund.finfoWindCode)">
+          <div v-if="!searchedFund.selected" class="fund-button" @click="addSelected(searchedFund.objectId)">
             <span >添加</span>
           </div>
-          <div v-else class="fund-button" @click="deleteSelected(searchedFund.finfoWindCode)">
-            <span class="cancle">取消自选</span>
+          <div v-else class="fund-button" @click="deleteSelected(searchedFund.objectId)">
+            <span class="cancle">取消</span>
           </div>
         </div>
         <div class="fund-detail-info">
@@ -92,11 +92,37 @@ export default {
         })
       }
     },
-    addSelected() {
-
+    async addSelected(fundId) {
+      let param = {
+        fundId: fundId,
+        userId: 1
+      }
+      if(!param.fundId || !param.userId ) return
+      await requestPage.addFundRequest(param)
+          .then(res => {
+            console.log(res)
+            // this.updateFundList(res)r
+            this.getSearchFundListData()
+          })
+          .catch(err => {
+            console.log(err)
+          })
     },
-    deleteSelected() {
-
+    async deleteSelected(fundId) {
+      let param = {
+        fundId: fundId,
+        userId: 1
+      }
+      if(!param.fundId || !param.userId ) return
+      await requestPage.deleteFundRequest(param)
+          .then(res => {
+            console.log(res)
+            // this.updateFundList(res)
+            this.getSearchFundListData()
+          })
+          .catch(err => {
+            console.log(err)
+          })
     }
   }
 }
