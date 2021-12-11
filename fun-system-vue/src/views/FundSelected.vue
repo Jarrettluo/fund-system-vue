@@ -12,21 +12,22 @@
           <span class="left">基金名称</span>
           <span class="right">净值</span>
         </div>
-        <div class="fund-group-item" @click="fundDetal">
+        <div class="fund-group-item" @click="fundDetal(selectedFund.finfoWindCode)"
+             v-for="selectedFund in fundList">
             <div class="fund-info">
               <div class="fund-info-name">
-                富国中证红利指数增强C
+                {{selectedFund.finfoFullname}}
               </div>
               <div class="fund-info-id">
-                008682
+                {{ selectedFund.finfoWindCode }}
               </div>
             </div>
           <div class="fund-price">
             <div class="fund-price-xx">
-              1.0779
+              {{ selectedFund.newNavUnit }}
             </div>
-            <div class="fund-price-percent">
-              -0.64%
+            <div class="fund-price-percent" :class="[selectedFund.newPercent > 0 ? 'red':'']">
+              {{ selectedFund.newPercent | numFilter }}%
             </div>
           </div>
         </div>
@@ -45,24 +46,65 @@
 </template>
 
 <script>
+  import requestPage from '../request/requests'
   export default {
     name: 'FundSelected',
     data() {
       return {
-
+        fundList: [],
       }
+    },
+    filters: {
+      numFilter(value) {
+        // 截取当前数据到小数点后两位
+        let realVal = parseFloat(value*100).toFixed(2);
+        return realVal;
+      }
+    },
+    mounted() {
+      this.getSelectFundListData();
     },
     methods: {
       logout() {
         console.log("logout")
         this.$router.push("/login")
       },
-      fundDetal() {
-        this.$router.push("/detail")
+      fundDetal(windCode) {
+        this.$router.push({
+          path: '/detail',
+          query: {
+            windCode: windCode
+          }
+        })
       },
       addSelected() {
         this.$router.push("/searchPage")
+      },
+      /**
+       * 异步提交数据给后台
+       * @author: 罗佳瑞
+       * @since: 2021年1月19日
+       */
+      async getSelectFundListData(){
+        let param = {
+          userId: 1
+        }
+        if(!param.userId) return
+        await requestPage.listFundRequest(param)
+            .then(res => {
+              console.log(res)
+              this.updateFundList(res)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+      },
+      updateFundList(res) {
+        if(res.code == 200 ) {
+          this.fundList = res.data;
+        }
       }
+
     }
   }
 
@@ -141,6 +183,9 @@
           }
           .fund-price-percent {
             color: #38b5ab;
+          }
+          .red {
+            color: red;
           }
 
         }

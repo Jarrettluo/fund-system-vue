@@ -5,7 +5,7 @@
         <input v-model="keyWord" placeholder="输入……">
       </div>
       <div class="search-button">
-        <span>
+        <span @click="getSearchFundListData">
           搜索
         </span>
         <span @click="backToSelected">
@@ -14,16 +14,19 @@
       </div>
     </div>
     <div class="search-result-group">
-      <div class="search-result-item">
+      <div class="search-result-item" v-for="searchedFund in fundList">
         <div class="fund-title">
           <div class="fund-title-name">
-            <span>富国中证红利指数增强乐基儿乐基儿</span>
+            <span>{{searchedFund.finfoFullname }}</span>
           </div>
           <div class="fund-title-code">
-            008682
+            {{ searchedFund.finfoWindCode }}
           </div>
-          <div class="fund-button">
-            <span>添加</span>
+          <div v-if="!searchedFund.selected" class="fund-button" @click="addSelected(searchedFund.objectId)">
+            <span >添加</span>
+          </div>
+          <div v-else class="fund-button" @click="deleteSelected(searchedFund.objectId)">
+            <span class="cancle">取消</span>
           </div>
         </div>
         <div class="fund-detail-info">
@@ -32,7 +35,7 @@
               基金经理人
             </div>
             <div class="detail-info manager">
-              徐由华等
+              {{ searchedFund.manager }}
             </div>
           </div>
           <div class="fund-detail">
@@ -40,7 +43,7 @@
               成立时间
             </div>
             <div class="detail-info time">
-              2021-03-10
+              {{ searchedFund.finfoSetupdate }}
             </div>
           </div>
         </div>
@@ -50,16 +53,76 @@
 </template>
 
 <script>
+import requestPage from '../request/requests'
 export default {
   name: 'SearchFund',
   data() {
     return {
       keyWord: null,
+      fundList: []
     }
   },
   methods: {
     backToSelected() {
       this.$router.push("/mySelected")
+    },
+    async getSearchFundListData(){
+      let param = {
+        keyWord: this.keyWord
+      }
+      if(!param.keyWord) return
+      await requestPage.searchRequest(param)
+          .then(res => {
+            console.log(res)
+            this.updateFundList(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    },
+    updateFundList(res) {
+      if(res.code == 200 ) {
+        this.fundList = res.data;
+        this.fundList.forEach(item => {
+          if(item.chinamutualfundmanagers.length > 1) {
+            item.manager = item.chinamutualfundmanagers[0].finfoFundmanager + "等"
+          } else {
+            item.manager = item.chinamutualfundmanagers[0].finfoFundmanager
+          }
+        })
+      }
+    },
+    async addSelected(fundId) {
+      let param = {
+        fundId: fundId,
+        userId: 1
+      }
+      if(!param.fundId || !param.userId ) return
+      await requestPage.addFundRequest(param)
+          .then(res => {
+            console.log(res)
+            // this.updateFundList(res)r
+            this.getSearchFundListData()
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    },
+    async deleteSelected(fundId) {
+      let param = {
+        fundId: fundId,
+        userId: 1
+      }
+      if(!param.fundId || !param.userId ) return
+      await requestPage.deleteFundRequest(param)
+          .then(res => {
+            console.log(res)
+            // this.updateFundList(res)
+            this.getSearchFundListData()
+          })
+          .catch(err => {
+            console.log(err)
+          })
     }
   }
 }
@@ -155,6 +218,9 @@ export default {
             background-color: #0082f9;
             border-radius: 16px;
             padding: 4px 16px;
+          }
+          .cancle {
+            background-color: #999999;
           }
         }
 

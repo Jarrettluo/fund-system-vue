@@ -9,23 +9,28 @@
     <div class="fund-container">
       <div class="fund-detail">
         <div class="fund-detail-name">
-          大成中证红利指数A
+          {{fundDetail.finfoFullname}}
         </div>
         <div class="fund-detail-id">
-          090010
+          {{ fundDetail.finfoWindCode }}
           <span><van-tag plain type="primary">高风险</van-tag></span>
         </div>
         <div class="fund-detail-group">
           <div class="fund-detail-group-item">
-            <div class="title person">夏高</div>
+            <div class="title person">
+              {{ fundDetail.manager }}
+            </div>
             <span>基金经理</span>
           </div>
           <div class="fund-detail-group-item">
-            <div class="title red">0.72%</div>
+            <div class="title" :class="[fundDetail.newPercent > 0 ? 'red':'']">
+              {{ fundDetail.newPercent | numFilter }}%</div>
             <span>日涨跌幅</span>
           </div>
           <div class="fund-detail-group-item">
-            <div class="title">1.9480</div>
+            <div class="title">
+              {{fundDetail.newNavUnit }}
+            </div>
             <span>最新净值</span>
           </div>
         </div>
@@ -36,23 +41,23 @@
         <div class="fund-trend-title">
           业绩走势
         </div>
-        <div class="fund-trend-chart">
-          曲线图
+        <div class="fund-trend-chart" style="width: 100%" >
+          <TrendCurve :data="fundTrend" ref="trend"></TrendCurve>
         </div>
         <div class="fund-trend-button">
-          <div class="button-item">
+          <div class="button-item" :class="[choosedId == 1 ? 'choosed':'']" @click="choosedId=1; getFundTrend(3)">
             近1个月
           </div>
-          <div class="button-item">
+          <div class="button-item" :class="[choosedId == 2 ? 'choosed':'']" @click="choosedId=2; getFundTrend(9)">
             近3个月
           </div>
-          <div class="button-item">
+          <div class="button-item" :class="[choosedId == 3 ? 'choosed':'']" @click="choosedId=3; getFundTrend(18)">
             近6个月
           </div>
-          <div class="button-item">
+          <div class="button-item" :class="[choosedId == 4 ? 'choosed':'']" @click="choosedId=4; getFundTrend(36)">
             近1年
           </div>
-          <div class="button-item">
+          <div class="button-item" :class="[choosedId == 5 ? 'choosed':'']" @click="choosedId=5; getFundTrend(108)">
             近3年
           </div>
         </div>
@@ -62,17 +67,90 @@
 </template>
 
 <script>
+import requestPage from '../request/requests'
+import TrendCurve from "@/components/TrendCurve";
 export default {
   name: "FundDetail",
   data() {
     return {
+      fundDetail: {},
+      fundTrend: [],
+      choosedId: 1,
 
     }
+  },
+  components: {
+    TrendCurve
+  },
+  filters: {
+    numFilter(value) {
+      // 截取当前数据到小数点后两位
+      let realVal = parseFloat(value*100).toFixed(2);
+      return realVal;
+    }
+  },
+  mounted() {
+    this.getFundDetailRequest();
   },
   methods: {
     backTo() {
       console.log("====")
       this.$router.push("/mySelected")
+    },
+    async getFundDetailRequest(){
+      let param = {
+        windCode: this.$route.query.windCode
+      }
+      if(!param.windCode) return
+      await requestPage.detailRequest(param)
+          .then(res => {
+            console.log(res)
+            this.updateFundDetail(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    },
+    updateFundDetail(res) {
+      if(res.code == 200 ) {
+        this.fundDetail = res.data;
+        if(this.fundDetail.chinamutualfundmanagers.length > 1) {
+          this.fundDetail.manager = this.fundDetail.chinamutualfundmanagers[0].finfoFundmanager + "等"
+        } else {
+          this.fundDetail.manager = this.fundDetail.chinamutualfundmanagers[0].finfoFundmanager
+        }
+        this.choosedId = 1;
+        this.getFundTrend(3);// 获取最近一个月的数据
+      }
+    },
+    async getFundTrend(period) {
+      let param = {
+        fInfoWindcode: this.$route.query.windCode,
+        period: period
+      }
+      if(!param.fInfoWindcode || !param.period) return
+      await requestPage.trendRequest(param)
+          .then(res => {
+            console.log(res)
+            this.updateFundTrend(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+    },
+    updateFundTrend(res){
+      if(res.code==200){
+        console.log(res.data)
+        var trendData = []
+        res.data.forEach(element => {
+          trendData.push({
+            time : element.priceDate,
+            tem : element.fnavUnit
+          })
+        })
+        // this.fundTrend = trendData;
+        this.$refs.trend.init(trendData); // 更新数据
+      }
     }
   }
 }
@@ -198,7 +276,7 @@ export default {
       }
       .fund-trend-chart {
         height: 300px;
-        background-color: #deebfd;
+        //background-color: #deebfd;
         line-height: 300px;
       }
       .fund-trend-button {
@@ -209,10 +287,15 @@ export default {
         padding: 20px 0px 10px 0px;
         .button-item {
           border-radius: 20px;
-          background-color: #eee;
           padding: 6px 8px;
           color: #666;
           font-size: 0.75rem;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        .choosed {
+          background-color: #eee;
         }
       }
     }
