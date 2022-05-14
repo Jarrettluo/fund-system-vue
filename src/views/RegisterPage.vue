@@ -1,7 +1,7 @@
 <template>
   <div class="main-body">
     <div class="container">
-      <van-form @submit="onSubmit">
+      <van-form @submit="register">
         <van-field
             v-model="username"
             name="用户名"
@@ -14,7 +14,7 @@
             name="手机号"
             label="手机号"
             placeholder="请输入手机号"
-            :rules="[{ required: true, message: '请填写用户名' }]"
+            :rules="[{ required: true, message: '请填写手机号' }]"
         />
         <van-field
             v-model="password"
@@ -55,20 +55,36 @@ export default {
     toLogin() {
       this.$router.push("/login")
     },
+    /**
+     *
+     */
     async register(){
       let data = {
         userName: this.username,
         userPassword: md5(this.password),
         userTelephone: this.telephone
       }
-      await loginPageRequest.loginRequest(data)
+      await loginPageRequest.registerRequest(data)
           .then(res => {
-            this.updateLoginResult(res)
+            this.updateRegisterResult(res);
           })
           .catch(err => {
             console.log(err)
           })
     },
+    /**
+     * 更新注册以后的结果
+     * @param res
+     */
+    updateRegisterResult(res){
+      if(res.code==200) {
+        this.$router.push("/login")
+          this.$Alert({message: "注册成功！",title:"提示",duration:2000});
+      }else {
+          console.log(res.message)
+          this.$Alert({message:res.message,title:"提示",duration:2000});
+      }
+    }
   },
 };
 </script>

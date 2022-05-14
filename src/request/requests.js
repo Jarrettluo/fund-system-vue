@@ -4,7 +4,7 @@ import axios from 'axios'
 import {
     LOGIN_URL, LOGOUT_URL, REGISTER_URL,
     ADD_FUND_URL, DELETE_FUND_URL, LIST_FUND_URL,
-    TREND_URL, DETAIL_URL, SEARCH_URL
+    TREND_URL, DETAIL_URL, SEARCH_URL, ALL_FUND_URL
 } from './urls.js'
 
 
@@ -91,6 +91,7 @@ function addFundRequest(data) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params:{},
             data: data,
@@ -118,6 +119,7 @@ function deleteFundRequest(data) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params:{},
             data: data,
@@ -145,6 +147,7 @@ function listFundRequest(param) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params: param,
             data: {},
@@ -174,6 +177,7 @@ function trendRequest(param) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params: param,
             data: {},
@@ -201,6 +205,7 @@ function detailRequest(param) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params: param,
             data: {},
@@ -228,6 +233,7 @@ function searchRequest(param) {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                token: sessionStorage.getItem('token')
             },
             params: param,
             data: {},
@@ -244,6 +250,7 @@ function searchRequest(param) {
 }
 
 
+
 export default {
     loginRequest,
     logoutRequest,
@@ -255,6 +262,5 @@ export default {
 
     trendRequest,
     detailRequest,
-    searchRequest,
-
+    searchRequest
 }

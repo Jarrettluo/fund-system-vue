@@ -41,7 +41,6 @@
     methods: {
       onSubmit(values) {
         console.log('submit', values);
-
       },
       toMyselected() {
         this.$router.push("/mySelected")
@@ -51,8 +50,8 @@
       },
       async login(){
         let data = {
-          userName: 'luojiarui', // this.username,
-          userPassword: '123456' // this.password
+          userName: this.username,
+          userPassword: md5(this.password)
         }
         await loginPageRequest.loginRequest(data)
             .then(res => {
@@ -64,10 +63,12 @@
       },
       updateLoginResult(res) {
         if(res.code==200) {
-          sessionStorage.setItem("token", res.data);
-          sessionStorage.setItem("userId", this.username);
-          sessionStorage.setItem("username", this.password);
+          sessionStorage.setItem("token", res.data.token);
+          sessionStorage.setItem("userId", res.data.userId);
+          sessionStorage.setItem("username", res.data.userName);
           this.toMyselected()
+        } else {
+            this.$Alert({message:res.message,title:"提示",duration:2000});
         }
       }
     },

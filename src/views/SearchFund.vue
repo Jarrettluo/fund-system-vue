@@ -62,15 +62,19 @@ export default {
       fundList: []
     }
   },
-  methods: {
+    mounted() {
+      this.getSearchFundListData();
+    },
+    methods: {
     backToSelected() {
       this.$router.push("/mySelected")
     },
     async getSearchFundListData(){
       let param = {
-        keyWord: this.keyWord
+        keyWord: "" | this.keyWord,
+        userId: sessionStorage.getItem("userId")
       }
-      if(!param.keyWord) return
+      // if(!param.keyWord) return
       await requestPage.searchRequest(param)
           .then(res => {
             console.log(res)
@@ -80,6 +84,7 @@ export default {
             console.log(err)
           })
     },
+
     updateFundList(res) {
       if(res.code == 200 ) {
         this.fundList = res.data;
@@ -95,7 +100,7 @@ export default {
     async addSelected(fundId) {
       let param = {
         fundId: fundId,
-        userId: 1
+        userId: sessionStorage.getItem("userId")
       }
       if(!param.fundId || !param.userId ) return
       await requestPage.addFundRequest(param)
@@ -111,7 +116,7 @@ export default {
     async deleteSelected(fundId) {
       let param = {
         fundId: fundId,
-        userId: 1
+        userId: sessionStorage.getItem("userId")
       }
       if(!param.fundId || !param.userId ) return
       await requestPage.deleteFundRequest(param)

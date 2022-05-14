@@ -11,6 +11,7 @@ const LIST_FUND_URL = BASE_URL + '/myFund/list'; // 列出自选列表
 const TREND_URL = BASE_URL + '/chinaMutualFundNav/trend'; // 基金详情页走势
 const DETAIL_URL = BASE_URL + '/chinaMutualFundDescription/details'; // 基金详情信息
 const SEARCH_URL = BASE_URL + '/chinaMutualFundDescription/search'; // 基金搜索
+const ALL_FUND_URL = BASE_URL + '/chinaMutualFundDescription/list'; // 基金列表
 
 
 module.exports = {
@@ -24,5 +25,6 @@ module.exports = {
 
     TREND_URL,
     DETAIL_URL,
-    SEARCH_URL
+    SEARCH_URL,
+    ALL_FUND_URL
 }

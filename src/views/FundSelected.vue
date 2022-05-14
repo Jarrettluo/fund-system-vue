@@ -68,6 +68,7 @@
       logout() {
         console.log("logout")
         this.$router.push("/login")
+        sessionStorage.clear();
       },
       fundDetal(windCode) {
         this.$router.push({
@@ -87,7 +88,7 @@
        */
       async getSelectFundListData(){
         let param = {
-          userId: 1
+          userId: sessionStorage.getItem("userId")
         }
         if(!param.userId) return
         await requestPage.listFundRequest(param)

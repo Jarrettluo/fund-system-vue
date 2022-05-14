@@ -60,4 +60,17 @@ const router = new VueRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  if (from.name == "LoginPage" && to.name == "RegisterPage") {
+    next() // 直接进行跳转，不再执行钩子函数
+    return
+  }
+  // 验证是否有token，如果在非登录页没有token，就跳转到登录页面
+  if (to.name !== 'LoginPage' && !sessionStorage.getItem("token")) {
+    next({name: 'LoginPage'})
+  }else {
+    next()
+  }
+})
+
 export default router
