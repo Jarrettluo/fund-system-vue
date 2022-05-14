@@ -51,21 +51,21 @@
 
 ⑤ 图表展示使用antV框架
 
-![image-20220514203430928](基金系统的说明书.assets/image-20220514203430928.png)
+![image-20220514203430928](./screenshot/image-20220514203430928.png)
 
-![image-20220514203529855](/Users/molly/Desktop/基金系统的说明书.assets/image-20220514203529855.png)
-
-
-
-![image-20220514203607635](/Users/molly/Desktop/基金系统的说明书.assets/image-20220514203607635.png)
+![image-20220514203529855](./screenshot/image-20220514203529855.png)
 
 
 
-![image-20220514203633485](/Users/molly/Desktop/基金系统的说明书.assets/image-20220514203633485.png)
+![image-20220514203607635](./screenshot/image-20220514203607635.png)
 
 
 
-![image-20220514203655996](/Users/molly/Desktop/基金系统的说明书.assets/image-20220514203655996.png)
+![image-20220514203633485](./screenshot/image-20220514203633485.png)
+
+
+
+![image-20220514203655996](./screenshot/image-20220514203655996.png)
 
 
 
